@@ -188,19 +188,20 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
     }
 
     case Compression::QZIP:{
-      const unsigned int qzlen = static_cast<unsigned int>(header.m_original_size);
+      unsigned int qzlen = static_cast<unsigned int>(header.m_original_size);
+      unsigned int qzclen = static_cast<unsigned int>(header.m_compressed_size);
 
       static QzSession_T session;
-      const QzSession_T *sess = &session;
+      QzSession_T *sess = &session;
 
-      if(qzDecompress (sess, ptr, header.m_compressed_size, dst, &qzlen) != QZ_OK){
+      if(qzDecompress (sess, ptr, &qzclen, dst, &qzlen) != QZ_OK){
         if(allocated){
           ut_free(dst);
         }
         return (DB_IO_DECOMPRESS_FAIL);
       }
 
-      len = static_cast<ulint>(zlen);
+      len = static_cast<ulint>(qzlen);
       
       break;
     }
