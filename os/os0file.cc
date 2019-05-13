@@ -88,6 +88,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 
 #include <sys/types.h>
 #include <zlib.h>
+#include <qatzip.h>
 #include <ctime>
 #include <functional>
 #include <new>
@@ -1383,6 +1384,31 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
                     static_cast<int>(compression_level)) != Z_OK) {
         *dst_len = src_len;
 
+        return (src);
+      }
+
+      len = static_cast<ulint>(zlen);
+
+      break;
+    }
+
+    case Compression::QZIP: {
+      unsigned int qzlen = static_cast<unsigned int>(out_len);
+
+      static QzSession_T session;
+      const QzSession_T *sess = &session;
+      static QzSessionParams_T parameters;
+      const QzSessionParams_T *params = &parameters;
+      params->comp_lvl = static_cast<int>(compression_level);
+
+
+
+      if (qzSetupSession (sess,params) != QZ_OK){
+        *dst_len = src_len;
+        return (src);
+      }
+      if (qzCompress (sess, reinterpret_cast<char *>(src) + FIL_PAGE_DATA, static_cast<unsigned int>(content_len), reinterpret_cast<char *>(dst) + FIL_PAGE_DATA, &qzlen, 1) != Z_OK) {
+        *dst_len = src_len;
         return (src);
       }
 

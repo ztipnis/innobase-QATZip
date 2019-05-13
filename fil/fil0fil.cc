@@ -8527,6 +8527,8 @@ dberr_t fil_set_compression(dict_table_t *table, const char *algorithm) {
     switch (srv_debug_compress) {
       case Compression::LZ4:
       case Compression::ZLIB:
+      case Compression::QZIP:
+      
       case Compression::NONE:
 
         compression.m_type = static_cast<Compression::Type>(srv_debug_compress);

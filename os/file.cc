@@ -50,6 +50,7 @@ external tools. */
 
 #include <lz4.h>
 #include <zlib.h>
+#include <qatzip.h>
 
 /**
 @param[in]      type            The compression type
@@ -183,6 +184,24 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
 
       len = static_cast<ulint>(zlen);
 
+      break;
+    }
+
+    case Compression::QZIP:{
+      const unsigned int qzlen = static_cast<unsigned int>(header.m_original_size);
+
+      static QzSession_T session;
+      const QzSession_T *sess = &session;
+
+      if(qzDecompress (sess, ptr, header.m_compressed_size, dst, &qzlen) != QZ_OK){
+        if(allocated){
+          ut_free(dst);
+        }
+        return (DB_IO_DECOMPRESS_FAIL);
+      }
+
+      len = static_cast<ulint>(zlen);
+      
       break;
     }
 

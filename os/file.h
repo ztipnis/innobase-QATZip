@@ -62,6 +62,8 @@ struct Compression {
     /** Use ZLib */
     ZLIB = 1,
 
+    /** Use HW Accelerated "zlib" QATZip */
+    QZIP = 3,
     /** Use LZ4 faster variant, usually lower compression. */
     LZ4 = 2
   };
@@ -95,7 +97,8 @@ struct Compression {
       case NONE:
       case ZLIB:
       case LZ4:
-
+      case QZIP:
+      
       default:
         ut_error;
     }

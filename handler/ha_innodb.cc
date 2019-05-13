@@ -2373,6 +2373,9 @@ dberr_t Compression::check(const char *algorithm, Compression *compression) {
   } else if (innobase_strcasecmp(algorithm, "lz4") == 0) {
     compression->m_type = LZ4;
 
+  } else if (innobase_strcasecmp(algorithm, "qatzip") == 0) {
+    compression->m_type = QZIP;
+    
   } else {
     return (DB_UNSUPPORTED);
   }
