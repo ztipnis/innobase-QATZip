@@ -38,6 +38,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
  Created 10/21/1995 Heikki Tuuri
  *******************************************************/
 
+#include <qatzip.h>
+#undef NONE
 #include "os0file.h"
 #include "fil0fil.h"
 #include "ha_prototypes.h"
@@ -88,7 +90,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 
 #include <sys/types.h>
 #include <zlib.h>
-#include <qatzip.h>
 #include <ctime>
 #include <functional>
 #include <new>
@@ -1396,9 +1397,9 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
       unsigned int qzlen = static_cast<unsigned int>(out_len);
 
       static QzSession_T session;
-      const QzSession_T *sess = &session;
+      QzSession_T *sess = &session;
       static QzSessionParams_T parameters;
-      const QzSessionParams_T *params = &parameters;
+      QzSessionParams_T *params = &parameters;
       params->comp_lvl = static_cast<int>(compression_level);
 
 
@@ -1407,12 +1408,13 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
         *dst_len = src_len;
         return (src);
       }
-      if (qzCompress (sess, reinterpret_cast<char *>(src) + FIL_PAGE_DATA, static_cast<unsigned int>(content_len), reinterpret_cast<char *>(dst) + FIL_PAGE_DATA, &qzlen, 1) != Z_OK) {
+      unsigned int clen = static_cast<unsigned int>(content_len)
+      if (qzCompress (sess, reinterpret_cast<const unsigned char *>(src) + FIL_PAGE_DATA, &clen , reinterpret_cast<unsigned char *>(dst) + FIL_PAGE_DATA, &qzlen, 1) != Z_OK) {
         *dst_len = src_len;
         return (src);
       }
 
-      len = static_cast<ulint>(zlen);
+      len = static_cast<ulint>(qzlen);
 
       break;
     }
