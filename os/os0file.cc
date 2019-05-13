@@ -1408,7 +1408,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
         *dst_len = src_len;
         return (src);
       }
-      unsigned int clen = static_cast<unsigned int>(content_len)
+      unsigned int clen = static_cast<unsigned int>(content_len);
       if (qzCompress (sess, reinterpret_cast<const unsigned char *>(src) + FIL_PAGE_DATA, &clen , reinterpret_cast<unsigned char *>(dst) + FIL_PAGE_DATA, &qzlen, 1) != Z_OK) {
         *dst_len = src_len;
         return (src);
