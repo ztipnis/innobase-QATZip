@@ -61,6 +61,8 @@ const char *Compression::to_string(Type type) {
       return ("None");
     case ZLIB:
       return ("Zlib");
+    case QZIP:
+      return ("QATZip");
     case LZ4:
       return ("LZ4");
   }
@@ -194,7 +196,7 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
       static QzSession_T session;
       QzSession_T *sess = &session;
 
-      if(qzDecompress (sess, ptr, &qzclen, dst, &qzlen) != QZ_OK){
+      if(qzDecompress(sess, ptr, &qzclen, dst, &qzlen) != QZ_OK){
         if(allocated){
           ut_free(dst);
         }
