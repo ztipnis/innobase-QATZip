@@ -98,7 +98,8 @@ struct Compression {
       case ZLIB:
       case LZ4:
       case QZIP:
-      
+      case QZIP_DCO:
+
       default:
         ut_error;
     }

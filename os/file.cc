@@ -63,6 +63,8 @@ const char *Compression::to_string(Type type) {
       return ("Zlib");
     case QZIP:
       return ("QATZip");
+    case QZIP:
+      return ("QATZip compression w/ Zlib decompression");
     case LZ4:
       return ("LZ4");
   }
@@ -173,6 +175,7 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
   compression.m_type = static_cast<Compression::Type>(header.m_algorithm);
 
   switch (compression.m_type) {
+    case Compression::QZIP_DCO:
     case Compression::ZLIB: {
       uLongf zlen = header.m_original_size;
 

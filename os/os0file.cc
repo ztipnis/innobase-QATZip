@@ -1393,6 +1393,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
       break;
     }
 
+    case Compression::QZIP_DCO:
     case Compression::QZIP: {
       unsigned int qzlen = static_cast<unsigned int>(out_len);
 
