@@ -64,6 +64,9 @@ struct Compression {
 
     /** Use HW Accelerated "zlib" QATZip */
     QZIP = 3,
+
+    /** Use HW Accelerated "zlib" QATZip for compression only */
+    QZIP_DCO = 4,
     /** Use LZ4 faster variant, usually lower compression. */
     LZ4 = 2
   };
