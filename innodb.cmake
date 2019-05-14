@@ -51,7 +51,7 @@ IF(UNIX AND NOT IGNORE_AIO_CHECK)
 ENDIF()
 
 INCLUDE_DIRECTORIES(/usr/local/include /usr/local/lib)
-LINK_LIBRARIES(libqatzip)
+LINK_LIBRARIES(libqatzip.so)
 
 OPTION(INNODB_COMPILER_HINTS "Compile InnoDB with compiler hints" ON)
 MARK_AS_ADVANCED(INNODB_COMPILER_HINTS)
