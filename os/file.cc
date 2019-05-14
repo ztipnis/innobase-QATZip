@@ -63,7 +63,7 @@ const char *Compression::to_string(Type type) {
       return ("Zlib");
     case QZIP:
       return ("QATZip");
-    case QZIP:
+    case QZIP_DCO:
       return ("QATZip compression w/ Zlib decompression");
     case LZ4:
       return ("LZ4");
