@@ -54,7 +54,7 @@ INCLUDE_DIRECTORIES(/usr/local/include /usr/local/lib)
 LINK_DIRECTORIES(/usr/local/include /usr/local/lib)
 ADD_LIBRARY(qatzip)
 set_property(TARGET testlib PROPERTY IMPORTED_LOCATION "/usr/local/lib/libqatzip.so")
-ADD_LIBRARIES(qatzip)
+LINK_LIBRARIES(qatzip)
 
 OPTION(INNODB_COMPILER_HINTS "Compile InnoDB with compiler hints" ON)
 MARK_AS_ADVANCED(INNODB_COMPILER_HINTS)
