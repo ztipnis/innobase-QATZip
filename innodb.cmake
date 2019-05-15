@@ -50,11 +50,10 @@ IF(UNIX AND NOT IGNORE_AIO_CHECK)
   ENDIF()
 ENDIF()
 
-find_package(qatzip REQUIRED)
+INCLUDE_DIRECTORIES(/usr/local/include /usr/local/lib)
 LINK_DIRECTORIES(/usr/local/include /usr/local/lib)
-INCLUDE_DIRECTORIES(${QATZIP_INCLUDE_DIR})
 ADD_LIBRARY(qatzip STATIC IMPORTED)
-set_property(TARGET qatzip PROPERTY IMPORTED_LOCATION ${QATZIP_LIBRARIES})
+set_property(TARGET qatzip PROPERTY IMPORTED_LOCATION "/usr/local/lib/libqatzip.so")
 LINK_LIBRARIES(qatzip)
 
 OPTION(INNODB_COMPILER_HINTS "Compile InnoDB with compiler hints" ON)
