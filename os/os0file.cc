@@ -40,6 +40,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 
 #include <qatzip.h>
 #undef NONE
+#include <stdio.h>
 #include "os0file.h"
 #include "fil0fil.h"
 #include "ha_prototypes.h"
@@ -1407,11 +1408,15 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
 
       if (qzSetupSession (sess,params) != QZ_OK){
         *dst_len = src_len;
+        printf("%s\n", "Error setting up QZip Session");
+        ib::warn() << "Error setting up QZip Session";
         return (src);
       }
       unsigned int clen = static_cast<unsigned int>(content_len);
       if (qzCompress (sess, reinterpret_cast<const unsigned char *>(src) + FIL_PAGE_DATA, &clen , reinterpret_cast<unsigned char *>(dst) + FIL_PAGE_DATA, &qzlen, 1) != Z_OK) {
         *dst_len = src_len;
+        printf("%s\n", "Error while using QZip Compression");
+        ib::warn() << "QZip Compression Error";
         return (src);
       }
 
@@ -1441,7 +1446,8 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
       *dst_len = src_len;
       return (src);
   }
-
+  printf("BEFORE: Block Size: %lu Source Size: %lu Compressed size: %lu\n",block_size,src_len,len);
+  ib::warn() << "BEFORE: Block Size:"<< block_size << "Source Size:" << src_len <<"Compressed size: " << len;
   ut_a(len <= out_len);
 
   ut_ad(memcmp(src + FIL_PAGE_LSN + 4,
@@ -1475,6 +1481,10 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
   if (len % block_size) {
     memset(dst + len, 0x0, block_size - (len % block_size));
   }
+  printf("AFTER: Block Size: %lu Source Size: %lu Compressed size: %lu\n",block_size,src_len,len);
+  ib::warn() << "AFTER: Block Size:"<< block_size << "Source Size:" << src_len <<"Compressed size: " << len;
+
+  
 
   return (dst);
 }
