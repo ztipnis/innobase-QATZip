@@ -99,6 +99,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 #include <data0type.h>
 #endif /* UNIV_HOTBACKUP */
 
+
+#ifdef assert
+#undef assert
+#endif
+#define assert(bval) if(!bval) ib::fatal("assertion error caught");
+
 /* Flush after each os_fsync_threshold bytes */
 unsigned long long os_fsync_threshold = 0;
 
