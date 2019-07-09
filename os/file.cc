@@ -197,7 +197,8 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
     }
 
     case Compression::QZIP:{
-      unsigned int qzlen = static_cast<unsigned int>(out_len);
+      unsigned int qzlen = static_cast<unsigned int>(header.m_original_size);
+      unsigned int qzclen = static_cast<unsigned int>(header.m_compressed_size);
 
       static QzSession_T session;
       QzSession_T *sess = &session;
@@ -234,7 +235,6 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
           ib::warn() << "Could not get QAT default parameters";
           return (src);
         }
-        params->comp_lvl = static_cast<int>(compression_level);
         int rc = qzSetupSession (sess,params);
         if (rc != QZ_OK && rc != QZ_DUPLICATE){
           qzTeardownSession(sess);
