@@ -1412,14 +1412,16 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
       int rc = qzInit(sess, 1);
       if(rc != QZ_OK && rc != QZ_DUPLICATE && rc != QZ_NO_HW){
         ib::error() << "Could not initialize QAT Process";
-        return (DB_IO_DECOMPRESS_FAIL);
+        *dst_len = src_len;
+        return (src);
       }else if(rc == QZ_NO_HW){
         ib::warn() << "Could not attach to QZ Hardware";
       }
       if(qzGetStatus (sess, &status ) != QZ_OK){
         //could not get status of card
         ib::error() << "Could not get QAT Status";
-        return (DB_IO_DECOMPRESS_FAIL);
+        *dst_len = src_len;
+        return (src);
       }
 
       if(status.qat_instance_attach == 0){
