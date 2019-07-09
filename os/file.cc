@@ -230,12 +230,11 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
         if(qzGetDefaults(params) != QZ_OK){
           ib::error() << "Could not get QAT default parameters";
         }
-        params->direction = QZ_DIR_BOTH;
         int rc = qzSetupSession (sess,params);
         if (rc != QZ_OK && rc != QZ_DUPLICATE){
           qzTeardownSession(sess);
           qzClose(sess);
-          ib::error() << "Error setting up QZip Session";
+          ib::warn() << "Error setting up QZip Session";
         }
       }
 
@@ -243,6 +242,8 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
         if(allocated){
           ut_free(dst);
         }
+        qzTeardownSession(sess);
+        qzClose(sess);
         return (DB_IO_DECOMPRESS_FAIL);
       }
       qzTeardownSession(sess);
