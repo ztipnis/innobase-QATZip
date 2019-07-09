@@ -210,9 +210,8 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
 
       if(qzGetStatus (sess, &status ) != QZ_OK){
         //could not get status of card
-        *dst_len = src_len;
         ib::error() << "Could not get QAT Status";
-        return (src);
+        return (DB_IO_DECOMPRESS_FAIL);
       }
       if(status.qat_hw_count <= 0){
         //no qzip card
@@ -222,26 +221,23 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
         //qzInit not started
         int rc = qzInit(sess, 1);
         if(rc != QZ_OK && rc != QZ_DUPLICATE){
-          *dst_len = src_len;
           ib::error() << "Could not initialize QAT Process";
-          return (src);
+          return (DB_IO_DECOMPRESS_FAIL);
         }
       }
 
       if(status.qat_instance_attach == 0){
         //qzSession not attached
         if(qzGetDefaults(params) != QZ_OK){
-          *dst_len = src_len;
           ib::warn() << "Could not get QAT default parameters";
-          return (src);
+          return (DB_IO_DECOMPRESS_FAIL);
         }
         int rc = qzSetupSession (sess,params);
         if (rc != QZ_OK && rc != QZ_DUPLICATE){
           qzTeardownSession(sess);
           qzClose(sess);
-          *dst_len = src_len;
           ib::warn() << "Error setting up QZip Session";
-          return (src);
+          return (DB_IO_DECOMPRESS_FAIL);
         }
       }
 
