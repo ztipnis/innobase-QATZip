@@ -1430,7 +1430,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
         }
       }
 
-      if(qat_instance_attach == 0){
+      if(status.qat_instance_attach == 0){
         //qzSession not attached
         if(qzGetDefaults(params) != QZ_OK){
           *dst_len = src_len;
