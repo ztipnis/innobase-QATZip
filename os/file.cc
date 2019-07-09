@@ -41,6 +41,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 /** NOTE: The functions in this file should only use functions from
 other files in library. The code in this file is used to make a library for
 external tools. */
+#ifdef assert
+#undef assert
+#endif
+#define assert(bval) if(!bval) ib::fatal() << "assertion error caught";
 #define NONE NONE_QZ
 #include <qatzip.h>
 #undef NONE
@@ -55,10 +59,6 @@ external tools. */
 #include <lz4.h>
 #include <zlib.h>
 
-#ifdef assert
-#undef assert
-#endif
-#define assert(bval) if(!bval) ib::fatal() << "assertion error caught";
 
 
 

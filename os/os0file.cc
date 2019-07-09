@@ -37,6 +37,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 
  Created 10/21/1995 Heikki Tuuri
  *******************************************************/
+#ifdef assert
+#undef assert
+#endif
+#define assert(bval) if(!bval) ib::fatal() << "assertion error caught";
 #define NONE NONE_QZ
 #include <qatzip.h>
 #undef NONE
@@ -100,10 +104,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 #endif /* UNIV_HOTBACKUP */
 
 
-#ifdef assert
-#undef assert
-#endif
-#define assert(bval) if(!bval) ib::fatal() << "assertion error caught";
 
 /* Flush after each os_fsync_threshold bytes */
 unsigned long long os_fsync_threshold = 0;
