@@ -1414,10 +1414,8 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
       }
       if(status.qat_hw_count <= 0){
         //no qzip card
-        *dst_len = src_len;
         printf("%s\n", "QuickAssist Card Not Found");
         ib::error() << "QuickAssist Card Not Found";
-        return (src);
       }
       if(status.qat_service_stated == 0){
         //qzInit not started
