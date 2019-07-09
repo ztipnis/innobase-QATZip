@@ -217,7 +217,7 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
       if(rc != QZ_OK && rc != QZ_DUPLICATE && rc != QZ_NO_HW){
         ib::error() << "Could not initialize QAT Process";
         return (DB_IO_DECOMPRESS_FAIL);
-      }else if(rc == QZ_NO_HW{
+      }else if(rc == QZ_NO_HW){
         ib::warn() << "Could not attach to QZ Hardware";
       }
       if(qzGetStatus (sess, &status ) != QZ_OK){
