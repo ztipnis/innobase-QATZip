@@ -222,6 +222,8 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
       if(status.qat_hw_count <= 0){
         //no qzip card
         ib::error() << "QuickAssist Card Not Found";
+      }else{
+        ib::info() << "Using QuickAssist Card";
       }
       if(status.qat_service_stated == 0){
         //qzInit not started
@@ -238,7 +240,7 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
           ib::warn() << "Could not get QAT default parameters";
           return (DB_IO_DECOMPRESS_FAIL);
         }
-        params->direction = QZ_DIR_DECOMPRESS;
+        params->direction = QZ_DIR_BOTH;
         int rc = qzSetupSession (sess,params);
         if (rc != QZ_OK && rc != QZ_DUPLICATE){
           qzTeardownSession(sess);

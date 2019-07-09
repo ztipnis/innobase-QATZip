@@ -1418,7 +1418,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
       }
       if(status.qat_hw_count <= 0){
         //no qzip card
-        ib::error() << "QuickAssist Card Not Found";
+        ib::error() << "Available QuickAssist Card Not Found";
       }
       if(status.qat_service_stated == 0){
         //qzInit not started
@@ -1482,7 +1482,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
       *dst_len = src_len;
       return (src);
   }
-  ib::warn() << "BEFORE: Block Size:"<< block_size << "Source Size:" << src_len <<"Compressed size: " << len;
+  //ib::warn() << "BEFORE: Block Size:"<< block_size << "Source Size:" << src_len <<"Compressed size: " << len;
   ut_a(len <= out_len);
 
   ut_ad(memcmp(src + FIL_PAGE_LSN + 4,
@@ -1516,7 +1516,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
   if (len % block_size) {
     memset(dst + len, 0x0, block_size - (len % block_size));
   }
-  ib::warn() << "AFTER: Block Size:"<< block_size << "Source Size:" << src_len <<"Compressed size: " << len;
+  //ib::warn() << "AFTER: Block Size:"<< block_size << "Source Size:" << src_len <<"Compressed size: " << len;
 
   
 
