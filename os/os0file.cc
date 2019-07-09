@@ -1409,25 +1409,17 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
       QzSessionParams_T *params = &parameters;
 
       QzStatus_T status;
-
+      int rc = qzInit(sess, 1);
+      if(rc != QZ_OK && rc != QZ_DUPLICATE && rc != QZ_NO_HW){
+        ib::error() << "Could not initialize QAT Process";
+        return (DB_IO_DECOMPRESS_FAIL);
+      }else if(rc == QZ_NO_HW){
+        ib::warn() << "Could not attach to QZ Hardware";
+      }
       if(qzGetStatus (sess, &status ) != QZ_OK){
         //could not get status of card
-        *dst_len = src_len;
         ib::error() << "Could not get QAT Status";
-        return (src);
-      }
-      if(status.qat_hw_count <= 0){
-        //no qzip card
-        ib::error() << "Available QuickAssist Card Not Found";
-      }
-      if(status.qat_service_stated == 0){
-        //qzInit not started
-        int rc = qzInit(sess, 1);
-        if(rc != QZ_OK && rc != QZ_DUPLICATE){
-          *dst_len = src_len;
-          ib::error() << "Could not initialize QAT Process";
-          return (src);
-        }
+        return (DB_IO_DECOMPRESS_FAIL);
       }
 
       if(status.qat_instance_attach == 0){
