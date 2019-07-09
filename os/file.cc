@@ -232,6 +232,7 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
           ib::warn() << "Could not get QAT default parameters";
           return (DB_IO_DECOMPRESS_FAIL);
         }
+        params->direction = QZ_DIR_COMPRESS;
         int rc = qzSetupSession (sess,params);
         if (rc != QZ_OK && rc != QZ_DUPLICATE){
           qzTeardownSession(sess);
