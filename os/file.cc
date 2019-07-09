@@ -55,6 +55,10 @@ external tools. */
 #include <lz4.h>
 #include <zlib.h>
 
+#ifdef assert
+#undef assert
+#endif
+#define assert(bval) if(!bval) ib::fatal() << "assertion error caught";
 
 
 
