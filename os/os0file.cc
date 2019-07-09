@@ -1448,6 +1448,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
         return (src);
       }
       qzTeardownSession(sess);
+      qzClose(sess);
       len = static_cast<ulint>(qzlen);
 
       break;
