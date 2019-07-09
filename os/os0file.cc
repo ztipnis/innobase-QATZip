@@ -1324,7 +1324,6 @@ ulint AIO::pending_io_count() const {
 
   return (reserved);
 }
-
 /** Compress a data page
 @param[in]  compression Compression algorithm
 @param[in]  block_size  File system block size
@@ -1400,22 +1399,60 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
 
       static QzSession_T session;
       QzSession_T *sess = &session;
+
       static QzSessionParams_T parameters;
       QzSessionParams_T *params = &parameters;
-      params->comp_lvl = static_cast<int>(compression_level);
 
+      QzStatus_T status;
 
-
-      if (qzSetupSession (sess,params) != QZ_OK){
+      if(qzGetStatus (sess, &status ) != QZ_OK){
+        //could not get status of card
         *dst_len = src_len;
-        printf("%s\n", "Error setting up QZip Session");
-        ib::warn() << "Error setting up QZip Session";
+        printf("%s\n", "Could not get QAT Status");
+        ib::error() << "Could not get QAT Status";
         return (src);
+      }
+      if(status.qat_hw_count <= 0){
+        //no qzip card
+        *dst_len = src_len;
+        printf("%s\n", "QuickAssist Card Not Found");
+        ib::error() << "QuickAssist Card Not Found";
+        return (src);
+      }
+      if(status.qat_service_stated == 0){
+        //qzInit not started
+        int rc = qzInit(sess, 1);
+        if(rc != QZ_OK && rc != QZ_DUPLICATE){
+          *dst_len = src_len;
+          printf("%s\n", "Could not initialize QAT Process");
+          ib::error() << "Could not initialize QAT Process";
+          return (src);
+        }
+      }
+
+      if(qat_instance_attach == 0){
+        //qzSession not attached
+        if(qzGetDefaults(params) != QZ_OK){
+          *dst_len = src_len;
+          printf("%s\n", "Could not get default parameters");
+          ib::warn() << "Could not get QAT default parameters";
+          return (src);
+        }
+        params->comp_lvl = static_cast<int>(compression_level);
+        int rc = qzSetupSession (sess,params);
+        if (rc != QZ_OK && rc != QZ_DUPLICATE){
+          qzTeardownSession(sess);
+          qzClose(sess);
+          *dst_len = src_len;
+          printf("%s\n", "Error setting up QZip Session");
+          ib::warn() << "Error setting up QZip Session";
+          return (src);
+        }
       }
       unsigned int clen = static_cast<unsigned int>(content_len);
       if (qzCompress (sess, reinterpret_cast<const unsigned char *>(src) + FIL_PAGE_DATA, &clen , reinterpret_cast<unsigned char *>(dst) + FIL_PAGE_DATA, &qzlen, 1) != Z_OK) {
         *dst_len = src_len;
-        printf("%s\n", "Error while using QZip Compression");
+        printf("%s\n", "QZip Compression Error");
         ib::warn() << "QZip Compression Error";
         return (src);
       }
