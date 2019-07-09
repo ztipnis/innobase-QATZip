@@ -197,11 +197,53 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
     }
 
     case Compression::QZIP:{
-      unsigned int qzlen = static_cast<unsigned int>(header.m_original_size);
-      unsigned int qzclen = static_cast<unsigned int>(header.m_compressed_size);
+      unsigned int qzlen = static_cast<unsigned int>(out_len);
 
       static QzSession_T session;
       QzSession_T *sess = &session;
+
+      static QzSessionParams_T parameters;
+      QzSessionParams_T *params = &parameters;
+
+      QzStatus_T status;
+
+      if(qzGetStatus (sess, &status ) != QZ_OK){
+        //could not get status of card
+        *dst_len = src_len;
+        ib::error() << "Could not get QAT Status";
+        return (src);
+      }
+      if(status.qat_hw_count <= 0){
+        //no qzip card
+        ib::error() << "QuickAssist Card Not Found";
+      }
+      if(status.qat_service_stated == 0){
+        //qzInit not started
+        int rc = qzInit(sess, 1);
+        if(rc != QZ_OK && rc != QZ_DUPLICATE){
+          *dst_len = src_len;
+          ib::error() << "Could not initialize QAT Process";
+          return (src);
+        }
+      }
+
+      if(status.qat_instance_attach == 0){
+        //qzSession not attached
+        if(qzGetDefaults(params) != QZ_OK){
+          *dst_len = src_len;
+          ib::warn() << "Could not get QAT default parameters";
+          return (src);
+        }
+        params->comp_lvl = static_cast<int>(compression_level);
+        int rc = qzSetupSession (sess,params);
+        if (rc != QZ_OK && rc != QZ_DUPLICATE){
+          qzTeardownSession(sess);
+          qzClose(sess);
+          *dst_len = src_len;
+          ib::warn() << "Error setting up QZip Session";
+          return (src);
+        }
+      }
 
       if(qzDecompress(sess, ptr, &qzclen, dst, &qzlen) != QZ_OK){
         if(allocated){
