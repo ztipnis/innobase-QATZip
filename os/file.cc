@@ -242,8 +242,6 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
         if(allocated){
           ut_free(dst);
         }
-        qzTeardownSession(sess);
-        qzClose(sess);
         return (DB_IO_DECOMPRESS_FAIL);
       }
       qzTeardownSession(sess);

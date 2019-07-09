@@ -1447,8 +1447,6 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
         ib::warn() << "QZip Compression Error";
         return (src);
       }
-      qzTeardownSession(sess);
-      qzClose(sess);
       len = static_cast<ulint>(qzlen);
 
       break;
