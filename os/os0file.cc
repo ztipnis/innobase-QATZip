@@ -1402,7 +1402,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
     case Compression::QZIP: {
       unsigned int qzlen = qzMaxCompressedLength(static_cast<unsigned int>(src_len));
 
-      QzSession_T session;
+      static thread_local QzSession_T session;
       QzSession_T *sess = &session;
 
       static QzSessionParams_T parameters;

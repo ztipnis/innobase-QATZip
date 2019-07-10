@@ -206,7 +206,7 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
       unsigned int qzlen = static_cast<unsigned int>(header.m_original_size);
       unsigned int qzclen = static_cast<unsigned int>(header.m_compressed_size);
 
-      QzSession_T session;
+      static thread_local QzSession_T session;
       QzSession_T *sess = &session;
 
       static QzSessionParams_T parameters;
