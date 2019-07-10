@@ -1409,7 +1409,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
       QzSessionParams_T *params = &parameters;
 
       QzStatus_T status;
-      int rc = qzInit(sess, 1);
+      int rc = qzInit(sess, 0);
       if(rc != QZ_OK && rc != QZ_DUPLICATE && rc != QZ_NO_HW){
         ib::error() << "Could not initialize QAT Process";
         *dst_len = src_len;
@@ -1444,10 +1444,15 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
         qzTeardownSession(sess);
         qzClose(sess);
         *dst_len = src_len;
-        ib::warn() << "QZip Compression Error";
+        ib::fatal() << "QZip Compression Error";
         return (src);
       }
       len = static_cast<ulint>(qzlen);
+      if (len == 0 || len >= out_len) {
+        *dst_len = src_len;
+        len = src_len;
+        return (src);
+      }
 
       break;
     }
@@ -1463,7 +1468,6 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
 
       if (len == 0 || len >= out_len) {
         *dst_len = src_len;
-
         return (src);
       }
 
