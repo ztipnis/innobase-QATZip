@@ -232,8 +232,6 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
         }
         int rc = qzSetupSession (sess,params);
         if (rc != QZ_OK && rc != QZ_DUPLICATE){
-          qzTeardownSession(sess);
-          qzClose(sess);
           ib::warn() << "Error setting up QZip Session";
         }
       }
@@ -244,8 +242,6 @@ dberr_t Compression::deserialize(bool dblwr_recover, byte *src, byte *dst,
         }
         return (DB_IO_DECOMPRESS_FAIL);
       }
-      qzTeardownSession(sess);
-      qzClose(sess);
       len = static_cast<ulint>(qzlen);
       
       break;

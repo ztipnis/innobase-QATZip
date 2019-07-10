@@ -1429,8 +1429,6 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
             throw std::exception();
           }
         }catch(...){
-          qzTeardownSession(sess);
-          qzClose(sess);
           ib::warn() << "Error setting up QZip Session";
         }
       }
@@ -1455,16 +1453,12 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
             throw std::exception();
           }
         }catch(...){
-          qzTeardownSession(sess);
-          qzClose(sess);
           ib::warn() << "Error setting up QZip Session";
         }
         
       }
       unsigned int clen = static_cast<unsigned int>(content_len);
       if (qzCompress (sess, reinterpret_cast<const unsigned char *>(src) + FIL_PAGE_DATA, &clen , reinterpret_cast<unsigned char *>(dst) + FIL_PAGE_DATA, &qzlen, 1) != Z_OK) {
-        qzTeardownSession(sess);
-        qzClose(sess);
         *dst_len = src_len;
         ib::fatal() << "QZip Compression Error";
         return (src);
