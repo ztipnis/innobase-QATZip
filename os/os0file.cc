@@ -1416,6 +1416,23 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
         return (src);
       }else if(rc == QZ_NO_HW){
         ib::warn() << "Could not attach to QZ Hardware";
+      }else if(rc != QZ_DUPLICATE){
+        if(qzGetDefaults(params) != QZ_OK){
+          *dst_len = src_len;
+          ib::fatal() << "Could not get QAT default parameters";
+          return (src);
+        }
+        params->comp_lvl = static_cast<int>(compression_level);
+        try{
+          int rc = qzSetupSession (sess,params);
+          if (rc != QZ_OK && rc != QZ_DUPLICATE && rc != QZ_NO_HW){
+            throw std::exception();
+          }
+        }catch(...){
+          qzTeardownSession(sess);
+          qzClose(sess);
+          ib::warn() << "Error setting up QZip Session";
+        }
       }
       if(qzGetStatus (sess, &status ) != QZ_OK){
         //could not get status of card
@@ -1428,7 +1445,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
         //qzSession not attached
         if(qzGetDefaults(params) != QZ_OK){
           *dst_len = src_len;
-          ib::warn() << "Could not get QAT default parameters";
+          ib::fatal() << "Could not get QAT default parameters";
           return (src);
         }
         params->comp_lvl = static_cast<int>(compression_level);
