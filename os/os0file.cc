@@ -1409,7 +1409,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
       QzSessionParams_T *params = &parameters;
 
       QzStatus_T status;
-      int rc = qzInit(sess, 0);
+      int rc = qzInit(sess, 1);
       if(rc != QZ_OK && rc != QZ_DUPLICATE && rc != QZ_NO_HW){
         ib::error() << "Could not initialize QAT Process";
         *dst_len = src_len;
@@ -1432,12 +1432,17 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
           return (src);
         }
         params->comp_lvl = static_cast<int>(compression_level);
-        int rc = qzSetupSession (sess,params);
-        if (rc != QZ_OK && rc != QZ_DUPLICATE){
+        try{
+          int rc = qzSetupSession (sess,params);
+          if (rc != QZ_OK && rc != QZ_DUPLICATE && rc != QZ_NO_HW){
+            throw ...;
+          }
+        }catch(...){
           qzTeardownSession(sess);
           qzClose(sess);
           ib::warn() << "Error setting up QZip Session";
         }
+        
       }
       unsigned int clen = static_cast<unsigned int>(content_len);
       if (qzCompress (sess, reinterpret_cast<const unsigned char *>(src) + FIL_PAGE_DATA, &clen , reinterpret_cast<unsigned char *>(dst) + FIL_PAGE_DATA, &qzlen, 1) != Z_OK) {
