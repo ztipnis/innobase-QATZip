@@ -1532,8 +1532,10 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
 
   
   counter++;
-  if(counter % 10000 == 0)
-    ib::info(counter);
+  if(counter >= 10000){
+    ib::info() << "compress called 10,000x";
+    counter = 0;
+  }
   return (dst);
 }
 
