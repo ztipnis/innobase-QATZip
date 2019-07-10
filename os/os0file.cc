@@ -1343,6 +1343,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
   ulint len = 0;
   ulint compression_level = page_zip_level;
   ulint page_type = mach_read_from_2(src + FIL_PAGE_TYPE);
+  static unsigned long int counter = 0;
 
   /* The page size must be a multiple of the OS punch hole size. */
   ut_ad(!(src_len % block_size));
@@ -1530,7 +1531,9 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
   //ib::warn() << "AFTER: Block Size:"<< block_size << "Source Size:" << src_len <<"Compressed size: " << len;
 
   
-
+  counter++;
+  if(counter % 10000 == 0)
+    ib::info(counter);
   return (dst);
 }
 
