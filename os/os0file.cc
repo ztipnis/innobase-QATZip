@@ -1435,7 +1435,7 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
         try{
           int rc = qzSetupSession (sess,params);
           if (rc != QZ_OK && rc != QZ_DUPLICATE && rc != QZ_NO_HW){
-            throw ...;
+            throw std::exception();
           }
         }catch(...){
           qzTeardownSession(sess);
