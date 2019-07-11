@@ -1337,13 +1337,13 @@ ulint AIO::pending_io_count() const {
 @param[out] dst   Compressed page contents
 @param[out] dst_len   Length in bytes of dst contents
 @return buffer data, dst_len will have the length of the data */
+static unsigned long int cprs_ctr = 0;
 static byte *os_file_compress_page(Compression compression, ulint block_size,
                                    byte *src, ulint src_len, byte *dst,
                                    ulint *dst_len) {
   ulint len = 0;
   ulint compression_level = page_zip_level;
   ulint page_type = mach_read_from_2(src + FIL_PAGE_TYPE);
-  static unsigned long int counter = 0;
 
   /* The page size must be a multiple of the OS punch hole size. */
   ut_ad(!(src_len % block_size));
@@ -1531,10 +1531,10 @@ static byte *os_file_compress_page(Compression compression, ulint block_size,
   //ib::warn() << "AFTER: Block Size:"<< block_size << "Source Size:" << src_len <<"Compressed size: " << len;
 
   
-  counter++;
-  if(counter >= 10000){
-    ib::info() << "compress called 10,000x";
-    counter = 0;
+  cprs_ctr++;
+  if(cprs_ctr >= 10000){
+    ib::warn() << "compress called 10,000x";
+    cprs_ctr = 0;
   }
   return (dst);
 }
